@@ -87,142 +87,132 @@ const CustomTableRow = (props: Props) => {
 
   const session = useSession();
 
+  const getUsers = async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 3000);
+    });
+
+    return [...rows];
+  };
+
   useEffect(() => {
-    // const getUsers = () => {
-    //   const { PATH, METHOD } = API_PATH.USERS.USERS_INFO_GET;
-    //   const response = fetchExtended(PATH, {
-    //     method: METHOD,
-    //   });
-
-    //   console.log("response => ", response);
-    // };
-
-    const { PATH, METHOD } = API_PATH.USERS.USERS_INFO_GET;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}${PATH}`, {
-      headers: {
-        "Conetent-Type": "application/json",
-        method: METHOD,
-        Authorization: `Bearer ${session.data?.user?.accessToken}`,
-      },
-    })
+    getUsers()
       .then((response) => {
-        console.log(response);
-
-        // setTest(true);
+        console.log("response => ", response);
+        setTest(response);
       })
       .catch((error) => console.error(error));
-  });
+  }, []);
 
   return (
     <>
-      {test &&
-        stableSort(rows, getComparator(order, orderBy))
-          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map((row: IUserResponse, index) => {
-            const isItemSelected = isSelected(row.userId);
-            const labelId = `enhanced-table-checkbox-${index}`;
+      {stableSort(test, getComparator(order, orderBy))
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+        .map((row: IUserResponse, index) => {
+          const isItemSelected = isSelected(row.userId);
+          const labelId = `enhanced-table-checkbox-${index}`;
 
-            return (
-              <TableRow
-                hover
-                onClick={(event) => handleClick(event, row.userId)}
-                role="checkbox"
-                aria-checked={isItemSelected}
-                tabIndex={-1}
-                key={row.userId}
-                selected={isItemSelected}
-              >
-                <TableCell padding="checkbox">
-                  <CustomCheckbox
-                    color="primary"
-                    checked={isItemSelected}
-                    inputProps={{
-                      "aria-labelledby": labelId,
-                    }}
-                  />
-                </TableCell>
+          return (
+            <TableRow
+              hover
+              onClick={(event) => handleClick(event, row.userId)}
+              role="checkbox"
+              aria-checked={isItemSelected}
+              tabIndex={-1}
+              key={row.userId}
+              selected={isItemSelected}
+            >
+              <TableCell padding="checkbox">
+                <CustomCheckbox
+                  color="primary"
+                  checked={isItemSelected}
+                  inputProps={{
+                    "aria-labelledby": labelId,
+                  }}
+                />
+              </TableCell>
 
-                <TableCell>
-                  <Box display="flex" alignItems="center">
-                    <Tooltip
-                      title={
-                        row.controlStatus === 0
-                          ? "오프라인"
-                          : row.controlStatus === 1
-                          ? "온라인"
-                          : "자리비움"
-                      }
-                      arrow
-                    >
-                      <Badge
-                        overlap="circular"
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "right",
-                        }}
-                        color={row.controlStatus === 1 ? "success" : "warning"}
-                        sx={{
-                          "& .MuiBadge-badge": {
-                            backgroundColor:
-                              row.controlStatus === 0 ? grey[500] : "",
-                          },
-                        }}
-                        badgeContent=" "
-                      >
-                        <Avatar
-                          src={row.profileImage}
-                          alt={`${row.userName} 프로필 이미지`}
-                          sx={{ width: 56, height: 56 }}
-                        />
-                      </Badge>
-                    </Tooltip>
-                    <Box
-                      sx={{
-                        ml: 2,
+              <TableCell>
+                <Box display="flex" alignItems="center">
+                  <Tooltip
+                    title={
+                      row.controlStatus === 0
+                        ? "오프라인"
+                        : row.controlStatus === 1
+                        ? "온라인"
+                        : "자리비움"
+                    }
+                    arrow
+                  >
+                    <Badge
+                      overlap="circular"
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "right",
                       }}
+                      color={row.controlStatus === 1 ? "success" : "warning"}
+                      sx={{
+                        "& .MuiBadge-badge": {
+                          backgroundColor:
+                            row.controlStatus === 0 ? grey[500] : "",
+                        },
+                      }}
+                      badgeContent=" "
                     >
-                      <Typography variant="h6" fontWeight="600">
-                        {row.userName}
-                      </Typography>
-
-                      <Typography color="textSecondary" variant="subtitle2">
-                        {row.roleLabel}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </TableCell>
-
-                <TableCell>
-                  <Typography variant="subtitle2">{row.userId}</Typography>
-                </TableCell>
-
-                <TableCell>
-                  <Chip
-                    color={row.isUse ? "success" : "error"}
-                    sx={{
-                      borderRadius: "6px",
-                    }}
-                    size="small"
-                    label={row.isUse ? "승인" : "미승인"}
-                  />
-                </TableCell>
-
-                <TableCell>
-                  <Typography>
-                    {format(new Date(row.createdAt as string), "yyyy. MM. dd")}
-                  </Typography>
-                </TableCell>
-
-                <TableCell width={60}>
-                  <Tooltip title="설정">
-                    <IconButton size="small" onClick={handleSettingsClick}>
-                      <IconDotsVertical size="1.1rem" />
-                    </IconButton>
+                      <Avatar
+                        src={row.profileImage}
+                        alt={`${row.userName} 프로필 이미지`}
+                        sx={{ width: 56, height: 56 }}
+                      />
+                    </Badge>
                   </Tooltip>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+                  <Box
+                    sx={{
+                      ml: 2,
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight="600">
+                      {row.userName}
+                    </Typography>
+
+                    <Typography color="textSecondary" variant="subtitle2">
+                      {row.roleLabel}
+                    </Typography>
+                  </Box>
+                </Box>
+              </TableCell>
+
+              <TableCell>
+                <Typography variant="subtitle2">{row.userId}</Typography>
+              </TableCell>
+
+              <TableCell>
+                <Chip
+                  color={row.isUse ? "success" : "error"}
+                  sx={{
+                    borderRadius: "6px",
+                  }}
+                  size="small"
+                  label={row.isUse ? "승인" : "미승인"}
+                />
+              </TableCell>
+
+              <TableCell>
+                <Typography>
+                  {format(new Date(row.createdAt as string), "yyyy. MM. dd")}
+                </Typography>
+              </TableCell>
+
+              <TableCell width={60}>
+                <Tooltip title="설정">
+                  <IconButton size="small" onClick={handleSettingsClick}>
+                    <IconDotsVertical size="1.1rem" />
+                  </IconButton>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+          );
+        })}
 
       {/* {emptyRows > 0 && (
         <TableRow
